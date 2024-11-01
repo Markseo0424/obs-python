@@ -61,6 +61,18 @@ mapping = {
     "a_43_num": (6, 14),
     "a_43_name": (6, 15),
     "a_43_major": (6, 16),
+    "a_14_num": (7, 5),
+    "a_14_name": (7, 6),
+    "a_14_major": (7, 7),
+    "a_24_num": (7, 8),
+    "a_24_name": (7, 9),
+    "a_24_major": (7, 10),
+    "a_34_num": (7, 11),
+    "a_34_name": (7, 12),
+    "a_34_major": (7, 13),
+    "a_44_num": (7, 14),
+    "a_44_name": (7, 15),
+    "a_44_major": (7, 16),
     "a_sub": (8, 2),
     "a_all": (9, 2),
     "teamname_b": (11, 1),
@@ -116,6 +128,18 @@ mapping = {
     "b_43_num": (14, 14),
     "b_43_name": (14, 15),
     "b_43_major": (14, 16),
+    "b_14_num": (15, 5),
+    "b_14_name": (15, 6),
+    "b_14_major": (15, 7),
+    "b_24_num": (15, 8),
+    "b_24_name": (15, 9),
+    "b_24_major": (15, 10),
+    "b_34_num": (15, 11),
+    "b_34_name": (15, 12),
+    "b_34_major": (15, 13),
+    "b_44_num": (15, 14),
+    "b_44_name": (15, 15),
+    "b_44_major": (15, 16),
     "b_sub": (16, 2),
     "b_all": (17, 2)
 }
@@ -146,7 +170,7 @@ def interpret(df):
                 newVal = read(df, *pos)
                 if newVal is np.nan:
                     break
-                val += ", " + str(newVal)
+                val += "," + str(newVal)
         elif "num" in key:
             val = read(df, *mapping[key])
             try:
@@ -164,11 +188,22 @@ def changeDf(df, it):
     data = it.copy()
     df2 = df.copy()
     for key in data.keys():
+        # print(key)
         pos = mapping[key]
         if "sub" in key or "all" in key:
-            data_list = data[key].split(", ")
+            data_list = data[key].split(",")
+            # replace(df2, *pos, "\t".join(data_list))
+            count = 0
             for dat in data_list:
-                replace(df2, *pos, dat)
+                dat = dat.strip()
+                count += 1
+                # print(count)
+                try:
+                    replace(df2, *pos, dat)
+                except:
+                    df2[f"add_{count}"] = ""
+                    replace(df2, *pos, dat)
+
                 pos = (pos[0], pos[1] + 1)
 
             while True:
@@ -188,11 +223,29 @@ class TeamScreen(QMainWindow):
         if 'num' in key:
             try:
                 val = int(val)
-            except TypeError:
+            except:
                 val = np.nan
 
         self.it[key] = val
+
+        self.update_allplayer()
         print(self.it)
+
+    def update_allplayer(self):
+        t = ""
+
+        num_input, name_input, belong_input = self.player_inputs[0]
+        if name_input.text():
+            t += num_input.text() + " " + name_input.text()
+
+        for i, (num_input, name_input, belong_input) in enumerate(self.player_inputs[1:]):
+            if name_input.text():
+                t += ", " + num_input.text() + " " + name_input.text()
+
+        if self.it[f"{self.team}_sub"]:
+            t += ", " + self.it[f"{self.team}_sub"]
+
+        self.it[f"{self.team}_all"] = t
 
     def wrapper(self, value):
         if isinstance(value, int):
@@ -285,17 +338,17 @@ class TeamScreen(QMainWindow):
 
         goalkeeper_belong_input = QLineEdit(self.wrapper(self.it[f"{self.team}_00_major"]))
         goalkeeper_belong_input.setPlaceholderText("Major")
-        goalkeeper_belong_input.textChanged.connect(lambda: self.changeData(f"{self.team}_00_major", goalkeeper_major_input))
+        goalkeeper_belong_input.textChanged.connect(lambda: self.changeData(f"{self.team}_00_major", goalkeeper_belong_input))
         goalkeeper_layout.addWidget(goalkeeper_belong_input)
 
         container = QWidget()
         container.setLayout(goalkeeper_layout)
-        self.player_grid_layout.addWidget(container, 0, 0, 1, 4)
+        self.player_grid_layout.addWidget(container, 0, 2, 1, 1)
         self.player_inputs.append((goalkeeper_number_input, goalkeeper_name_input, goalkeeper_belong_input))
 
         # Other rows for field players
         for i in range(1, 5):  # 1 goalkeeper + 4*4 = 17 slots
-            for j in range(4):
+            for j in range(5):
                 playernum = str(i) + str(j)
                 player_layout = QVBoxLayout()
 
@@ -352,7 +405,7 @@ class TeamScreen(QMainWindow):
         formation_counts = [0, 0, 0, 0, 0]
         for i, (num_input, name_input, belong_input) in enumerate(self.player_inputs[1:]):
             if name_input.text().strip():
-                row = i // 4
+                row = i // 5
                 formation_counts[row] += 1
 
         formation = '-'.join(str(count) for count in formation_counts if count > 0)
@@ -380,7 +433,7 @@ class TeamScreen(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     main_window = TeamScreen(
-        r"C:\Users\marks\OneDrive\Documents\SNU\동아리\SUB\SUB Sports\SUB SPORTS TEMPLATE\team_info_converted.csv", 0)
+        r"C:\Users\marks\OneDrive\Documents\SNU\동아리\SUB\SUB Sports\2024-07 SHA-CUP\assets\team_info_converted.csv", 0)
     main_window.show()
     sys.exit(app.exec_())
 

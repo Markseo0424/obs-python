@@ -17,7 +17,7 @@ after_effects_path = r"C:\Program Files\Adobe\Adobe After Effects 2024\Support F
 script_path = r".\render.jsx"
 
 # Path to the After Effects project file
-project_path = r"C:\Users\marks\OneDrive\Documents\SNU\동아리\SUB\SUB Sports\SUB SPORTS TEMPLATE\SUBsports (converted) - 복사본.aep"
+project_path = r"C:\Users\marks\OneDrive\Documents\SNU\동아리\SUB\SUB Sports\SUB SPORTS TEMPLATE\SUBsports_v2.aep"
 
 csv_path = r"C:\Users\marks\OneDrive\Documents\SNU\동아리\SUB\SUB Sports\SUB SPORTS TEMPLATE\team_info_converted.csv"
 
